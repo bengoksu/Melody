@@ -164,7 +164,11 @@ Android emülatörünü başlatın veya fiziksel Android cihazınızı bilgisaya
 ```bash
 flutter run
 ```
+### Test Ortamı
 
+Uygulama, Android Studio üzerinden oluşturulan Pixel 7
+Android Emulator ve fiziksel Android cihaz kullanılarak
+çalıştırılmış ve test edilmiştir.
 ## 🎯 Proje Kazanımları
 
 Bu proje kapsamında;
