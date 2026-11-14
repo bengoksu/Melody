@@ -8,17 +8,14 @@ const _gold = Color(0xFFD9B779);
 const _muted = Color(0xFFAAAAAA);
 
 class InstrumentDetailScreen extends StatelessWidget {
-  const InstrumentDetailScreen({
-    super.key,
-    required this.instrument,
-    required this.onAddToCart,
-  });
+  const InstrumentDetailScreen({super.key, required this.onAddToCart});
 
-  final Instrument instrument;
-  final VoidCallback onAddToCart;
+  final ValueChanged<Instrument> onAddToCart;
 
   @override
   Widget build(BuildContext context) {
+    final instrument = ModalRoute.of(context)!.settings.arguments as Instrument;
+
     return Scaffold(
       backgroundColor: _background,
       appBar: AppBar(
@@ -128,7 +125,7 @@ class InstrumentDetailScreen extends StatelessWidget {
                 height: 56,
                 child: ElevatedButton.icon(
                   onPressed: () {
-                    onAddToCart();
+                    onAddToCart(instrument);
                     ScaffoldMessenger.of(context)
                       ..hideCurrentSnackBar()
                       ..showSnackBar(

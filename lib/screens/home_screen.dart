@@ -80,10 +80,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => InstrumentDetailScreen(
-          instrument: instrument,
-          onAddToCart: () => _addToCart(instrument),
-        ),
+        settings: RouteSettings(arguments: instrument),
+        builder: (_) => InstrumentDetailScreen(onAddToCart: _addToCart),
       ),
     );
   }
