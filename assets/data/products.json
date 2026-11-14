@@ -1,0 +1,65 @@
+[
+  {
+    "name": "Gitar",
+    "price": "₺18.990",
+    "category": "Telli",
+    "imagePath": "assets/images/guitar.png",
+    "description": "Sıcak ve dengeli tonuyla akor çalışmalarından sahne performanslarına kadar her seviyeye uyum sağlayan klasik bir gitar."
+  },
+  {
+    "name": "Piyano",
+    "price": "₺64.500",
+    "category": "Tuşlu",
+    "imagePath": "assets/images/piano.jpg",
+    "description": "Zengin ses aralığı ve hassas tuşeleriyle hem temel eğitim hem de ileri seviye eserler için etkileyici bir piyano."
+  },
+  {
+    "name": "Keman",
+    "price": "₺12.750",
+    "category": "Telli",
+    "imagePath": "assets/images/violin.png",
+    "description": "Parlak ve duygulu tonlar sunan, dengeli gövde yapısı sayesinde rahat bir çalım deneyimi sağlayan zarif bir keman."
+  },
+  {
+    "name": "Bateri",
+    "price": "₺42.900",
+    "category": "Vurmalı",
+    "imagePath": "assets/images/drums.jpg",
+    "description": "Güçlü vuruşları ve dengeli parçalarıyla prova, eğitim ve sahne kullanımında ritmin merkezinde yer alan bir bateri seti."
+  },
+  {
+    "name": "Flüt",
+    "price": "₺6.490",
+    "category": "Nefesli",
+    "imagePath": "assets/images/flute.jpg",
+    "description": "Berrak sesi, hafif yapısı ve rahat tutuşuyla nefesli çalgılara başlamak isteyenler için ideal bir flüt."
+  },
+  {
+    "name": "Ukulele",
+    "price": "₺4.250",
+    "category": "Telli",
+    "imagePath": "assets/images/ukulele.jpg",
+    "description": "Neşeli tonu ve kompakt gövdesiyle kolay taşınan, temel akorları hızla öğrenmek isteyenlere uygun bir ukulele."
+  },
+  {
+    "name": "Saksafon",
+    "price": "₺31.800",
+    "category": "Nefesli",
+    "imagePath": "assets/images/saxophone.jpg",
+    "description": "Dolgun ve karakterli sesiyle cazdan pop müziğe uzanan farklı tarzlarda güçlü bir ifade sunan saksafon."
+  },
+  {
+    "name": "Çello",
+    "price": "₺39.900",
+    "category": "Telli",
+    "imagePath": "assets/images/cello.png",
+    "description": "Derin ve sıcak tonlarıyla solo çalımlarda ve topluluk performanslarında güçlü bir anlatım sunan çello."
+  },
+  {
+    "name": "Klarnet",
+    "price": "₺14.600",
+    "category": "Nefesli",
+    "imagePath": "assets/images/clarinet.jpg",
+    "description": "Yumuşak alt tonlardan parlak üst notalara uzanan geniş ses aralığıyla farklı müzik türlerine uyum sağlayan klarnet."
+  }
+]

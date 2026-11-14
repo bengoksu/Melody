@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../models/instrument.dart';
+import 'cart_screen.dart';
 import 'instrument_detail_screen.dart';
 
 const _background = Color(0xFF141414);
@@ -16,75 +21,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final List<Instrument> _cart = [];
+  List<Instrument> _instruments = [];
+  bool _isLoading = true;
   String _selectedCategory = 'Tümü';
   String _searchText = '';
 
   static const _categories = ['Tümü', 'Telli', 'Tuşlu', 'Vurmalı', 'Nefesli'];
-  static const _instruments = [
-    Instrument(
-      'Gitar',
-      'Telli',
-      '₺18.990',
-      'assets/images/guitar.png',
-      Icons.music_note_rounded,
-    ),
-    Instrument(
-      'Piyano',
-      'Tuşlu',
-      '₺64.500',
-      'assets/images/piano.jpg',
-      Icons.piano_rounded,
-    ),
-    Instrument(
-      'Keman',
-      'Telli',
-      '₺12.750',
-      'assets/images/violin.png',
-      Icons.graphic_eq_rounded,
-    ),
-    Instrument(
-      'Bateri',
-      'Vurmalı',
-      '₺42.900',
-      'assets/images/drums.jpg',
-      Icons.album_rounded,
-    ),
-    Instrument(
-      'Flüt',
-      'Nefesli',
-      '₺6.490',
-      'assets/images/flute.jpg',
-      Icons.linear_scale_rounded,
-    ),
-    Instrument(
-      'Ukulele',
-      'Telli',
-      '₺4.250',
-      'assets/images/ukulele.jpg',
-      Icons.music_note_rounded,
-    ),
-    Instrument(
-      'Saksafon',
-      'Nefesli',
-      '₺31.800',
-      'assets/images/saxophone.jpg',
-      Icons.queue_music_rounded,
-    ),
-    Instrument(
-      'Çello',
-      'Telli',
-      '₺39.900',
-      'assets/images/cello.png',
-      Icons.graphic_eq_rounded,
-    ),
-    Instrument(
-      'Klarnet',
-      'Nefesli',
-      '₺14.600',
-      'assets/images/clarinet.jpg',
-      Icons.linear_scale_rounded,
-    ),
-  ];
 
   List<Instrument> get _filteredInstruments => _instruments.where((instrument) {
     final matchesCategory =
@@ -96,6 +39,38 @@ class _HomeScreenState extends State<HomeScreen> {
   }).toList();
 
   @override
+  void initState() {
+    super.initState();
+    _loadInstruments();
+  }
+
+  Future<void> _loadInstruments() async {
+    try {
+      final jsonString = await rootBundle.loadString(
+        'assets/data/products.json',
+      );
+      final jsonList = jsonDecode(jsonString) as List<dynamic>;
+      final instruments = jsonList
+          .map((item) => Instrument.fromJson(item as Map<String, dynamic>))
+          .toList();
+
+      if (mounted) {
+        setState(() {
+          _instruments = instruments;
+        });
+      }
+    } catch (error) {
+      debugPrint('Enstrümanlar yüklenemedi: $error');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
@@ -105,8 +80,24 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => InstrumentDetailScreen(enstrumanAdi: instrument.name),
+        builder: (_) => InstrumentDetailScreen(
+          instrument: instrument,
+          onAddToCart: () => _addToCart(instrument),
+        ),
       ),
+    );
+  }
+
+  void _addToCart(Instrument instrument) {
+    setState(() {
+      _cart.add(instrument);
+    });
+  }
+
+  void _openCart() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => CartScreen(cartItems: _cart)),
     );
   }
 
@@ -141,7 +132,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     SliverPadding(
                       padding: EdgeInsets.fromLTRB(side, 10, side, 0),
                       sliver: SliverToBoxAdapter(
-                        child: _TopBar(onUnavailableTap: _showComingSoon),
+                        child: _TopBar(
+                          onUnavailableTap: _showComingSoon,
+                          onCartTap: _openCart,
+                        ),
                       ),
                     ),
                     SliverPadding(
@@ -203,7 +197,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                    if (_filteredInstruments.isEmpty)
+                    if (_isLoading)
+                      const SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Center(
+                          child: CircularProgressIndicator(color: _gold),
+                        ),
+                      )
+                    else if (_filteredInstruments.isEmpty)
                       const SliverFillRemaining(
                         hasScrollBody: false,
                         child: _EmptyResult(),
@@ -211,26 +212,29 @@ class _HomeScreenState extends State<HomeScreen> {
                     else
                       SliverPadding(
                         padding: EdgeInsets.fromLTRB(side, 0, side, 32),
-                        sliver: SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 14,
-                                crossAxisSpacing: 14,
-                                childAspectRatio: constraints.maxWidth < 360
-                                    ? 0.68
-                                    : 0.74,
-                              ),
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            final instrument = _filteredInstruments[index];
-                            return _InstrumentCard(
-                              instrument: instrument,
-                              onTap: () => _openDetail(instrument),
-                            );
-                          }, childCount: _filteredInstruments.length),
+                        sliver: SliverToBoxAdapter(
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.zero,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 14,
+                                  crossAxisSpacing: 14,
+                                  childAspectRatio: constraints.maxWidth < 360
+                                      ? 0.68
+                                      : 0.74,
+                                ),
+                            itemCount: _filteredInstruments.length,
+                            itemBuilder: (context, index) {
+                              final instrument = _filteredInstruments[index];
+                              return _InstrumentCard(
+                                instrument: instrument,
+                                onTap: () => _openDetail(instrument),
+                              );
+                            },
+                          ),
                         ),
                       ),
                   ],
@@ -245,8 +249,10 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class _TopBar extends StatelessWidget {
-  const _TopBar({required this.onUnavailableTap});
+  const _TopBar({required this.onUnavailableTap, required this.onCartTap});
+
   final ValueChanged<String> onUnavailableTap;
+  final VoidCallback onCartTap;
 
   @override
   Widget build(BuildContext context) {
@@ -270,8 +276,8 @@ class _TopBar extends StatelessWidget {
         const SizedBox(width: 10),
         _HeaderButton(
           icon: Icons.shopping_bag_outlined,
-          tooltip: 'Sepet (yakında)',
-          onTap: () => onUnavailableTap('Sepet'),
+          tooltip: 'Sepet',
+          onTap: onCartTap,
         ),
       ],
     );
@@ -521,8 +527,8 @@ class _InstrumentCard extends StatelessWidget {
                             fit: BoxFit.contain,
                             errorBuilder: (context, error, stackTrace) {
                               return Center(
-                                child: Icon(
-                                  instrument.icon,
+                                child: const Icon(
+                                  Icons.music_note_rounded,
                                   size: 43,
                                   color: _gold,
                                 ),
@@ -597,19 +603,4 @@ class _EmptyResult extends StatelessWidget {
       ),
     );
   }
-}
-
-class Instrument {
-  const Instrument(
-    this.name,
-    this.category,
-    this.price,
-    this.imagePath,
-    this.icon,
-  );
-  final String name;
-  final String category;
-  final String price;
-  final String imagePath;
-  final IconData icon;
 }
